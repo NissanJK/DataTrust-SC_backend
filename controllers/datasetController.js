@@ -183,24 +183,25 @@ exports.exportCSV = async (req, res) => {
     const data = await Dataset.find();
 
     let csvData =
-      "Record_ID,Timestamp,Sector,Data_Provider_Type,Data_Category,Temperature_C,Air_Quality_Index,Traffic_Density,Energy_Consumption_kWh,Blockchain_Tx_Cost_Gas,Authorization_Latency_sec,Hash\n";
+      "Record_ID,Timestamp,Data_Owner,Sector,Data_Provider_Type,Data_Category,Temperature_C,Air_Quality_Index,Traffic_Density,Energy_Consumption_kWh,Blockchain_Tx_Cost_Gas,Authorization_Latency_sec,Hash\n";
 
     data.forEach((d, i) => {
       const temp = d.metadata.Temperature_C !== null ? d.metadata.Temperature_C : '-';
       const aqi = d.metadata.Air_Quality_Index !== null ? d.metadata.Air_Quality_Index : '-';
       const traffic = d.metadata.Traffic_Density !== null ? d.metadata.Traffic_Density : '-';
       const energy = d.metadata.Energy_Consumption_kWh !== null ? d.metadata.Energy_Consumption_kWh : '-';
+      const ownerRole = d.metadata.ownerRole || 'unknown';
       const sector = d.metadata.Sector || 'unknown';
       const txCost = d.metadata.Blockchain_Tx_Cost_Gas || '-';
       const authLatency = d.metadata.Authorization_Latency_sec || '-';
 
       csvData +=
-        `${i + 1},${d.createdAt},${sector},${d.metadata.Data_Provider_Type},${d.metadata.Data_Category},` +
+        `${i + 1},${d.createdAt},${ownerRole},${sector},${d.metadata.Data_Provider_Type},${d.metadata.Data_Category},` +
         `${temp},${aqi},${traffic},${energy},${txCost},${authLatency},${d.hash}\n`;
     });
 
     res.header("Content-Type", "text/csv");
-    res.attachment("privysharing_dataset.csv");
+    res.attachment("DataTrust-SC_dataset.csv");
     res.send(csvData);
 
   } catch (error) {
